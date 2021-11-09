@@ -254,6 +254,7 @@ public class NetworkClient implements KafkaClient {
      */
     @Override
     public List<ClientResponse> poll(long timeout, long now) {
+        // 按需更新元数据
         long metadataTimeout = metadataUpdater.maybeUpdate(now);
         try {
             this.selector.poll(Utils.min(timeout, metadataTimeout, requestTimeoutMs));
@@ -537,8 +538,8 @@ public class NetworkClient implements KafkaClient {
         @Override
         public long maybeUpdate(long now) {
             // should we update our metadata?
-            long timeToNextMetadataUpdate = metadata.timeToNextUpdate(now); // 显式需要刷新缓存或缓存超过过期时间
-            long timeToNextReconnectAttempt = Math.max(this.lastNoNodeAvailableMs + metadata.refreshBackoff() - now, 0);
+            long timeToNextMetadataUpdate = metadata.timeToNextUpdate(now); // 显式需要刷新缓存(主动调用#requestUpdate()) 或缓存超过过期时间
+            long timeToNextReconnectAttempt = Math.max(this.lastNoNodeAvailableMs + metadata.refreshBackoff() - now, 0); // 之前没有可用节点的时间+backoff缓冲间隔
             long waitForMetadataFetch = this.metadataFetchInProgress ? Integer.MAX_VALUE : 0;
             // if there is no node available to connect, back off refreshing metadata
             long metadataTimeout = Math.max(Math.max(timeToNextMetadataUpdate, timeToNextReconnectAttempt),
@@ -547,6 +548,7 @@ public class NetworkClient implements KafkaClient {
             if (metadataTimeout == 0) {
                 // Beware that the behavior of this method and the computation of timeouts for poll() are
                 // highly dependent on the behavior of leastLoadedNode.
+                // 获取一个 inFlightRequests 负载最低的节点, 去拉取元数据
                 Node node = leastLoadedNode(now);
                 maybeUpdate(now, node);
             }

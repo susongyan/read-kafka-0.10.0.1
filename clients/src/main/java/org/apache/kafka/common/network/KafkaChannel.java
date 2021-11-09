@@ -19,13 +19,10 @@ package org.apache.kafka.common.network;
 
 
 import java.io.IOException;
-
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.channels.SelectionKey;
-
 import java.security.Principal;
-
 import org.apache.kafka.common.utils.Utils;
 
 public class KafkaChannel {
@@ -118,6 +115,10 @@ public class KafkaChannel {
         return socket.getInetAddress().toString();
     }
 
+    /**
+     * 设置待发送请求，并开始监听 op_write 事件
+     * @param send
+     */
     public void setSend(Send send) {
         if (this.send != null)
             throw new IllegalStateException("Attempt to begin a send operation with prior send operation still in progress.");

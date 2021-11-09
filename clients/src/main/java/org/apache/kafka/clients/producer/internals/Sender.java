@@ -220,6 +220,10 @@ public class Sender implements Runnable {
             log.trace("Created {} produce requests: {}", requests.size(), requests);
             pollTimeout = 0;
         }
+
+        // 这边只是把请求怼到 inFlightRequests的 Map<String, Deque<ClientRequest>> 队列里边，
+        // 对应broker的连接 KafkaChannel 开始关注 op_write 事件，并没有真正发送
+        // 所有的io请求和响应处理都在 #poll() 逻辑里
         for (ClientRequest request : requests)
             client.send(request, now);
 

@@ -31,11 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
 import org.apache.kafka.common.KafkaException;
+import org.apache.kafka.common.MetricName;
 import org.apache.kafka.common.metrics.Measurable;
 import org.apache.kafka.common.metrics.MetricConfig;
-import org.apache.kafka.common.MetricName;
 import org.apache.kafka.common.metrics.Metrics;
 import org.apache.kafka.common.metrics.Sensor;
 import org.apache.kafka.common.metrics.stats.Avg;
@@ -288,9 +287,16 @@ public class Selector implements Selectable {
 
         long endIo = time.nanoseconds();
         this.sensors.ioTime.record(endIo - endSelect, time.milliseconds());
+        // 释放最近最少使用的连接
         maybeCloseOldestConnection();
     }
 
+    /**
+     * 轮询准备好进行io操作的 SelectionKeys 
+     * 
+     * @param selectionKeys
+     * @param isImmediatelyConnected
+     */
     private void pollSelectionKeys(Iterable<SelectionKey> selectionKeys, boolean isImmediatelyConnected) {
         Iterator<SelectionKey> iterator = selectionKeys.iterator();
         while (iterator.hasNext()) {
@@ -306,7 +312,7 @@ public class Selector implements Selectable {
 
                 /* complete any connections that have finished their handshake (either normally or immediately) */
                 if (isImmediatelyConnected || key.isConnectable()) {
-                    if (channel.finishConnect()) {
+                    if (channel.finishConnect()) { //阻塞等待连接建立完毕
                         this.connected.add(channel.id());
                         this.sensors.connectionCreated.record();
                     } else
@@ -324,6 +330,9 @@ public class Selector implements Selectable {
                         addToStagedReceives(channel, networkReceive);
                 }
 
+                /**
+                 * 真正发送io请求
+                 */
                 /* if channel is ready write to any sockets that have space in their buffer and for which we have data */
                 if (channel.ready() && key.isWritable()) {
                     Send send = channel.write();
@@ -403,6 +412,10 @@ public class Selector implements Selectable {
             unmute(channel);
     }
 
+
+    /**
+     * 每隔 connections.max.idle.ms=9 分钟， 关闭空闲超过9分钟的连接
+     */
     private void maybeCloseOldestConnection() {
         if (currentTimeNanos > nextIdleCloseCheckTime) {
             if (lruConnections.isEmpty()) {
