@@ -220,7 +220,9 @@ public class NetworkClient implements KafkaClient {
      * @param node The node
      */
     private boolean canSendRequest(String node) {
-        return connectionStates.isConnected(node) && selector.isChannelReady(node) && inFlightRequests.canSendMore(node);
+        return connectionStates.isConnected(node) && selector.isChannelReady(node) 
+        // inflight 能存在几个等待响应的请求
+        && inFlightRequests.canSendMore(node);
     }
 
     /**

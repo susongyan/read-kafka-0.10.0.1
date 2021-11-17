@@ -2,111 +2,124 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <resourceExtensions>
-      <entry name=".+\.(properties|xml|html|dtd|tld)" />
-      <entry name=".+\.(gif|png|jpeg|jpg)" />
+      <entry name=".+\.(properties|xml|html|dtd|tld)"/>
+      <entry name=".+\.(gif|png|jpeg|jpg)"/>
     </resourceExtensions>
     <wildcardResourcePatterns>
-      <entry name="!?*.class" />
-      <entry name="!?*.scala" />
-      <entry name="!?*.java" />
-      <entry name="!?*.groovy" />
+      <entry name="!?*.class"/>
+      <entry name="!?*.scala"/>
+      <entry name="!?*.java"/>
+      <entry name="!?*.groovy"/>
     </wildcardResourcePatterns>
-    <bytecodeTargetLevel target="1.7" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="clients" target="1.7"/>
+      <module name="connect" target="1.7"/>
+      <module name="core" target="1.7"/>
+      <module name="kafka-0.10.0.1-src-examples" target="1.7"/>
+      <module name="log4j-appender" target="1.7"/>
+      <module name="streams" target="1.7"/>
+      <module name="tools" target="1.7"/>
+      <module name="api" target="1.7"/>
+      <module name="file" target="1.7"/>
+      <module name="json" target="1.7"/>
+      <module name="runtime" target="1.7"/>
+      <module name="streams-examples" target="1.7"/>
+    </bytecodeTargetLevel>
   </component>
-  <component name="CopyrightManager" default="" />
+  <component name="CopyrightManager" default=""/>
   <component name="DependencyValidationManager">
-    <option name="SKIP_IMPORT_STATEMENTS" value="false" />
+    <option name="SKIP_IMPORT_STATEMENTS" value="false"/>
   </component>
-  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="ExternalStorageConfigurationManager" enabled="true"/>
   <component name="FrameworkDetectionExcludesConfiguration">
-    <file type="web" url="file://$PROJECT_DIR$" />
+    <file type="web" url="file://$PROJECT_DIR$"/>
   </component>
-  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleMigrationSettings" migrationVersion="1"/>
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <option name="distributionType" value="DEFAULT_WRAPPED" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="distributionType" value="DEFAULT_WRAPPED"/>
+        <option name="externalProjectPath" value="$PROJECT_DIR$"/>
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$"/>
           </set>
         </option>
       </GradleProjectSettings>
     </option>
   </component>
   <component name="GradleUISettings">
-    <setting name="root" />
+    <setting name="root"/>
   </component>
   <component name="GradleUISettings2">
-    <setting name="root" />
+    <setting name="root"/>
   </component>
-  <component name="IdProvider" IDEtalkID="11DA1DB66DD62DDA1ED602B7079FE97C" />
+  <component name="IdProvider" IDEtalkID="11DA1DB66DD62DDA1ED602B7079FE97C"/>
   <component name="InspectionProjectProfileManager">
     <profile version="1.0">
-      <option name="myName" value="Project Default" />
+      <option name="myName" value="Project Default"/>
     </profile>
-    <version value="1.0" />
+    <version value="1.0"/>
   </component>
   <component name="JavadocGenerationManager">
-    <option name="OUTPUT_DIRECTORY" />
-    <option name="OPTION_SCOPE" value="protected" />
-    <option name="OPTION_HIERARCHY" value="true" />
-    <option name="OPTION_NAVIGATOR" value="true" />
-    <option name="OPTION_INDEX" value="true" />
-    <option name="OPTION_SEPARATE_INDEX" value="true" />
-    <option name="OPTION_DOCUMENT_TAG_USE" value="false" />
-    <option name="OPTION_DOCUMENT_TAG_AUTHOR" value="false" />
-    <option name="OPTION_DOCUMENT_TAG_VERSION" value="false" />
-    <option name="OPTION_DOCUMENT_TAG_DEPRECATED" value="true" />
-    <option name="OPTION_DEPRECATED_LIST" value="true" />
-    <option name="OTHER_OPTIONS" value="" />
-    <option name="HEAP_SIZE" />
-    <option name="LOCALE" />
-    <option name="OPEN_IN_BROWSER" value="true" />
+    <option name="OUTPUT_DIRECTORY"/>
+    <option name="OPTION_SCOPE" value="protected"/>
+    <option name="OPTION_HIERARCHY" value="true"/>
+    <option name="OPTION_NAVIGATOR" value="true"/>
+    <option name="OPTION_INDEX" value="true"/>
+    <option name="OPTION_SEPARATE_INDEX" value="true"/>
+    <option name="OPTION_DOCUMENT_TAG_USE" value="false"/>
+    <option name="OPTION_DOCUMENT_TAG_AUTHOR" value="false"/>
+    <option name="OPTION_DOCUMENT_TAG_VERSION" value="false"/>
+    <option name="OPTION_DOCUMENT_TAG_DEPRECATED" value="true"/>
+    <option name="OPTION_DEPRECATED_LIST" value="true"/>
+    <option name="OTHER_OPTIONS" value=""/>
+    <option name="HEAP_SIZE"/>
+    <option name="LOCALE"/>
+    <option name="OPEN_IN_BROWSER" value="true"/>
   </component>
   <component name="ProjectCodeStyleConfiguration">
-    <option name="USE_PER_PROJECT_SETTINGS" value="true" />
+    <option name="USE_PER_PROJECT_SETTINGS" value="true"/>
     <code_scheme name="Project" version="173">
       <JavaCodeStyleSettings>
-        <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
-        <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
+        <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99"/>
+        <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99"/>
       </JavaCodeStyleSettings>
     </code_scheme>
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module filepath="$PROJECT_DIR$/kafka-0.10.0.1-src.iml" fileurl="file://$PROJECT_DIR$/kafka-0.10.0.1-src.iml" />
-      <module filepath="$PROJECT_DIR$/clients/clients.iml" fileurl="file://$PROJECT_DIR$/clients/clients.iml" />
-      <module filepath="$PROJECT_DIR$/connect/connect.iml" fileurl="file://$PROJECT_DIR$/connect/connect.iml" />
-      <module filepath="$PROJECT_DIR$/core/core.iml" fileurl="file://$PROJECT_DIR$/core/core.iml" />
-      <module filepath="$PROJECT_DIR$/examples/kafka-0.10.0.1-src-examples.iml" fileurl="file://$PROJECT_DIR$/examples/kafka-0.10.0.1-src-examples.iml" />
-      <module filepath="$PROJECT_DIR$/log4j-appender/log4j-appender.iml" fileurl="file://$PROJECT_DIR$/log4j-appender/log4j-appender.iml" />
-      <module filepath="$PROJECT_DIR$/streams/streams.iml" fileurl="file://$PROJECT_DIR$/streams/streams.iml" />
-      <module filepath="$PROJECT_DIR$/tools/tools.iml" fileurl="file://$PROJECT_DIR$/tools/tools.iml" />
-      <module filepath="$PROJECT_DIR$/connect/api/api.iml" fileurl="file://$PROJECT_DIR$/connect/api/api.iml" />
-      <module filepath="$PROJECT_DIR$/connect/file/file.iml" fileurl="file://$PROJECT_DIR$/connect/file/file.iml" />
-      <module filepath="$PROJECT_DIR$/connect/json/json.iml" fileurl="file://$PROJECT_DIR$/connect/json/json.iml" />
-      <module filepath="$PROJECT_DIR$/connect/runtime/runtime.iml" fileurl="file://$PROJECT_DIR$/connect/runtime/runtime.iml" />
-      <module filepath="$PROJECT_DIR$/streams/examples/streams-examples.iml" fileurl="file://$PROJECT_DIR$/streams/examples/streams-examples.iml" />
+      <module filepath="$PROJECT_DIR$/kafka-0.10.0.1-src.iml" fileurl="file://$PROJECT_DIR$/kafka-0.10.0.1-src.iml"/>
+      <module filepath="$PROJECT_DIR$/clients/clients.iml" fileurl="file://$PROJECT_DIR$/clients/clients.iml"/>
+      <module filepath="$PROJECT_DIR$/connect/connect.iml" fileurl="file://$PROJECT_DIR$/connect/connect.iml"/>
+      <module filepath="$PROJECT_DIR$/core/core.iml" fileurl="file://$PROJECT_DIR$/core/core.iml"/>
+      <module filepath="$PROJECT_DIR$/examples/kafka-0.10.0.1-src-examples.iml" fileurl="file://$PROJECT_DIR$/examples/kafka-0.10.0.1-src-examples.iml"/>
+      <module filepath="$PROJECT_DIR$/log4j-appender/log4j-appender.iml" fileurl="file://$PROJECT_DIR$/log4j-appender/log4j-appender.iml"/>
+      <module filepath="$PROJECT_DIR$/streams/streams.iml" fileurl="file://$PROJECT_DIR$/streams/streams.iml"/>
+      <module filepath="$PROJECT_DIR$/tools/tools.iml" fileurl="file://$PROJECT_DIR$/tools/tools.iml"/>
+      <module filepath="$PROJECT_DIR$/connect/api/api.iml" fileurl="file://$PROJECT_DIR$/connect/api/api.iml"/>
+      <module filepath="$PROJECT_DIR$/connect/file/file.iml" fileurl="file://$PROJECT_DIR$/connect/file/file.iml"/>
+      <module filepath="$PROJECT_DIR$/connect/json/json.iml" fileurl="file://$PROJECT_DIR$/connect/json/json.iml"/>
+      <module filepath="$PROJECT_DIR$/connect/runtime/runtime.iml" fileurl="file://$PROJECT_DIR$/connect/runtime/runtime.iml"/>
+      <module filepath="$PROJECT_DIR$/streams/examples/streams-examples.iml" fileurl="file://$PROJECT_DIR$/streams/examples/streams-examples.iml"/>
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" project-jdk-name="1.8" project-jdk-type="JavaSDK">
-    <output url="file://$PROJECT_DIR$/out" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8" project-jdk-type="JavaSDK" assert-keyword="true" assert-jdk-15="true">
+    <output url="file://$PROJECT_DIR$/out"/>
   </component>
   <component name="SvnBranchConfigurationManager">
-    <option name="mySupportsUserInfoFilter" value="true" />
+    <option name="mySupportsUserInfoFilter" value="true"/>
   </component>
   <component name="libraryTable">
     <library name="scala-sdk-2.10.6" type="Scala">
-      <CLASSES />
-      <JAVADOC />
-      <SOURCES />
+      <CLASSES/>
+      <JAVADOC/>
+      <SOURCES/>
       <properties>
         <compiler-classpath>
-          <root url="file://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-compiler/2.10.6/9b15174852f5b6bb1edbf303d5722286a0a54011/scala-compiler-2.10.6.jar" />
-          <root url="file://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-library/2.10.6/421989aa8f95a05a4f894630aad96b8c7b828732/scala-library-2.10.6.jar" />
-          <root url="file://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-reflect/2.10.6/3259f3df0f166f017ef5b2d385445808398c316c/scala-reflect-2.10.6.jar" />
+          <root url="file:///Users/holysu/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-compiler/2.10.6/9b15174852f5b6bb1edbf303d5722286a0a54011/scala-compiler-2.10.6.jar"/>
+          <root url="file:///Users/holysu/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-library/2.10.6/421989aa8f95a05a4f894630aad96b8c7b828732/scala-library-2.10.6.jar"/>
+          <root url="file:///Users/holysu/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-reflect/2.10.6/3259f3df0f166f017ef5b2d385445808398c316c/scala-reflect-2.10.6.jar"/>
         </compiler-classpath>
       </properties>
     </library>
@@ -116,15 +129,15 @@
       <state key="ArtifactsStructureConfigurable.UI">
         <UIState>
           <splitter-proportions>
-            <SplitterProportionsDataImpl />
+            <SplitterProportionsDataImpl/>
           </splitter-proportions>
-          <settings />
+          <settings/>
         </UIState>
       </state>
       <state key="Copyright.UI">
         <UIState>
           <splitter-proportions>
-            <SplitterProportionsDataImpl />
+            <SplitterProportionsDataImpl/>
           </splitter-proportions>
         </UIState>
       </state>
@@ -134,7 +147,7 @@
             <SplitterProportionsDataImpl>
               <option name="proportions">
                 <list>
-                  <option value="0.2" />
+                  <option value="0.2"/>
                 </list>
               </option>
             </SplitterProportionsDataImpl>
@@ -145,9 +158,9 @@
       <state key="ScopeChooserConfigurable.UI">
         <UIState>
           <splitter-proportions>
-            <SplitterProportionsDataImpl />
+            <SplitterProportionsDataImpl/>
           </splitter-proportions>
-          <settings />
+          <settings/>
         </UIState>
       </state>
     </states>

@@ -182,6 +182,7 @@ public class Sender implements Runnable {
         long notReadyTimeout = Long.MAX_VALUE;
         while (iter.hasNext()) {
             Node node = iter.next();
+            // 连接可连接、 并且node下等待响应的请求数小于 maxInFlightRequestsPerConnection 
             if (!this.client.ready(node, now)) {
                 iter.remove();
                 notReadyTimeout = Math.min(notReadyTimeout, this.client.connectionDelay(node, now));
@@ -194,7 +195,8 @@ public class Sender implements Runnable {
                                                                          result.readyNodes,
                                                                          this.maxRequestSize,
                                                                          now);
-        //max.in.flight.requests.per.connection == 1
+        // guaranteeMessageOrder = max.in.flight.requests.per.connection == 1
+        // 将此次要发送的 TopicPartition 都先存到 muted里，以免在收到这批量请求的响应前，又发送了请求 保证请求一个个发送
         if (guaranteeMessageOrder) {
             // Mute all the partitions drained
             for (List<RecordBatch> batchList : batches.values()) {

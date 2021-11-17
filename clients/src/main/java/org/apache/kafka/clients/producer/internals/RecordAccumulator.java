@@ -318,19 +318,27 @@ public final class RecordAccumulator {
                 synchronized (deque) {
                     RecordBatch batch = deque.peekFirst();
                     if (batch != null) {
+                        // 需要重试，但是还没到下次重试时间
                         boolean backingOff = batch.attempts > 0 && batch.lastAttemptMs + retryBackoffMs > nowMs;
+                        // 已等待时间，batch创建或上次尝试发送到现在
                         long waitedTimeMs = nowMs - batch.lastAttemptMs;
+                        // 需要等待的时间 lingerMs 或重试间隔
                         long timeToWaitMs = backingOff ? retryBackoffMs : lingerMs;
+                        // 剩余等待时间
                         long timeLeftMs = Math.max(timeToWaitMs - waitedTimeMs, 0);
                         boolean full = deque.size() > 1 || batch.records.isFull();
-                        boolean expired = waitedTimeMs >= timeToWaitMs;
+                        // 已等待超时
+                        boolean expired = waitedTimeMs >= timeToWaitMs; 
+                        // 可发送的batch： batch已满、等待超时、缓存池内存耗尽、已关闭、flush状态
                         boolean sendable = full || expired || exhausted || closed || flushInProgress();
+                        // 将可发送的batch 对应的broker leader加入到 readyNodes
                         if (sendable && !backingOff) {
                             readyNodes.add(leader);
                         } else {
                             // Note that this results in a conservative estimate since an un-sendable partition may have
                             // a leader that will later be found to have sendable data. However, this is good enough
                             // since we'll just wake up and then sleep again for the remaining time.
+                            // 下次检查有 ready batches 最少要等待的时长
                             nextReadyCheckDelayMs = Math.min(timeLeftMs, nextReadyCheckDelayMs);
                         }
                     }
@@ -392,6 +400,7 @@ public final class RecordAccumulator {
                                 boolean backoff = first.attempts > 0 && first.lastAttemptMs + retryBackoffMs > now;
                                 // Only drain the batch if it is not during backoff period.
                                 if (!backoff) {
+                                    // 对于每个broker，一次发送的批量请求大小不能超过 maxSize
                                     if (size + first.records.sizeInBytes() > maxSize && !ready.isEmpty()) {
                                         // there is a rare case that a single batch size is larger than the request size due
                                         // to compression; in this case we will still eventually send this batch in a single
