@@ -77,6 +77,7 @@ public class NetworkReceive implements Receive {
     @Deprecated
     public long readFromReadableChannel(ReadableByteChannel channel) throws IOException {
         int read = 0;
+        // 先读取4个字节的int值，代表报文的长度
         if (size.hasRemaining()) {
             int bytesRead = channel.read(size);
             if (bytesRead < 0)
