@@ -268,6 +268,7 @@ public class Selector implements Selectable {
 
         clear();
 
+        // hasStagedReivves说明已经有kafkaChannel接收到完整的信息了，这时候select不要等待
         if (hasStagedReceives() || !immediatelyConnectedKeys.isEmpty())
             timeout = 0;
 
@@ -283,6 +284,7 @@ public class Selector implements Selectable {
             pollSelectionKeys(immediatelyConnectedKeys, true);
         }
 
+        // 添加到已完成的响应队列里
         addToCompletedReceives();
 
         long endIo = time.nanoseconds();
