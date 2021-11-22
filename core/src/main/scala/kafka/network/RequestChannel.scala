@@ -176,9 +176,18 @@ object RequestChannel extends Logging {
   case object CloseConnectionAction extends ResponseAction
 }
 
+/**
+ * 请求channel， 请求的中转站？ 暂存请求和响应
+ * processor处理io接收完整的请求, 放在requestQueue里, 供 KafkaRequestHandler线程做逻辑处理
+ * 处理完毕的结果, 等待 processor 通过io发给客户端
+ *
+ * @param numProcessors
+ * @param queueSize
+ */
 class RequestChannel(val numProcessors: Int, val queueSize: Int) extends KafkaMetricsGroup {
   private var responseListeners: List[(Int) => Unit] = Nil
   private val requestQueue = new ArrayBlockingQueue[RequestChannel.Request](queueSize)
+  // 每个processor io处理器单独分配一个响应队列
   private val responseQueues = new Array[BlockingQueue[RequestChannel.Response]](numProcessors)
   for(i <- 0 until numProcessors)
     responseQueues(i) = new LinkedBlockingQueue[RequestChannel.Response]()

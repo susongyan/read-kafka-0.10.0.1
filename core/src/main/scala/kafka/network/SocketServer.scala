@@ -51,8 +51,8 @@ import scala.util.control.{ControlThrowable, NonFatal}
 class SocketServer(val config: KafkaConfig, val metrics: Metrics, val time: Time) extends Logging with KafkaMetricsGroup {
 
   private val endpoints = config.listeners
-  private val numProcessorThreads = config.numNetworkThreads
-  private val maxQueuedRequests = config.queuedMaxRequests
+  private val numProcessorThreads = config.numNetworkThreads // processor线程数，默认3个
+  private val maxQueuedRequests = config.queuedMaxRequests // 请求阻塞队列数量，默认500个
   private val totalProcessorThreads = numProcessorThreads * endpoints.size
 
   private val maxConnectionsPerIp = config.maxConnectionsPerIp
@@ -60,9 +60,12 @@ class SocketServer(val config: KafkaConfig, val metrics: Metrics, val time: Time
 
   this.logIdent = "[Socket Server on Broker " + config.brokerId + "], "
 
+  // 请求channel，内含一个请求队列 ArrayBlockingQueue
   val requestChannel = new RequestChannel(totalProcessorThreads, maxQueuedRequests)
+  // 请求io处理器processor
   private val processors = new Array[Processor](totalProcessorThreads)
 
+  // 网络连接接收器
   private[network] val acceptors = mutable.Map[EndPoint, Acceptor]()
   private var connectionQuotas: ConnectionQuotas = _
 
@@ -80,6 +83,7 @@ class SocketServer(val config: KafkaConfig, val metrics: Metrics, val time: Time
 
       connectionQuotas = new ConnectionQuotas(maxConnectionsPerIp, maxConnectionsPerIpOverrides)
 
+      //发送和接收缓冲大小默认都是 100KB
       val sendBufferSize = config.socketSendBufferBytes
       val recvBufferSize = config.socketReceiveBufferBytes
       val brokerId = config.brokerId
@@ -92,6 +96,7 @@ class SocketServer(val config: KafkaConfig, val metrics: Metrics, val time: Time
         for (i <- processorBeginIndex until processorEndIndex)
           processors(i) = newProcessor(i, connectionQuotas, protocol)
 
+        // 连接建立接收器
         val acceptor = new Acceptor(endpoint, sendBufferSize, recvBufferSize, brokerId,
           processors.slice(processorBeginIndex, processorEndIndex), connectionQuotas)
         acceptors.put(endpoint, acceptor)
@@ -265,7 +270,7 @@ private[kafka] class Acceptor(val endPoint: EndPoint,
                 val key = iter.next
                 iter.remove()
                 if (key.isAcceptable)
-                  accept(key, processors(currentProcessor))
+                  accept(key, processors(currentProcessor)) // 将新建立的连接分配给 processor
                 else
                   throw new IllegalStateException("Unrecognized key state for acceptor thread.")
 
@@ -323,7 +328,7 @@ private[kafka] class Acceptor(val endPoint: EndPoint,
     val socketChannel = serverSocketChannel.accept()
     try {
       connectionQuotas.inc(socketChannel.socket().getInetAddress)
-      socketChannel.configureBlocking(false)
+      socketChannel.configureBlocking(false) // 非阻塞
       socketChannel.socket().setTcpNoDelay(true)
       socketChannel.socket().setKeepAlive(true)
       socketChannel.socket().setSendBufferSize(sendBufferSize)

@@ -184,7 +184,7 @@ class KafkaServer(val config: KafkaConfig, time: Time = SystemTime, threadNamePr
         logManager.startup()
 
         /* generate brokerId */
-        config.brokerId =  getBrokerId
+        config.brokerId =  getBrokerId // 从配置文件获取brokerId 或者基于zk生成
         this.logIdent = "[Kafka Server " + config.brokerId + "], "
 
         socketServer = new SocketServer(config, metrics, kafkaMetricsTime)
@@ -211,8 +211,10 @@ class KafkaServer(val config: KafkaConfig, time: Time = SystemTime, threadNamePr
         }
 
         /* start processing requests */
+        // 服务端api处理，各种请求的具体处理逻辑(生产消息、拉取元数据等）
         apis = new KafkaApis(socketServer.requestChannel, replicaManager, groupCoordinator,
           kafkaController, zkUtils, config.brokerId, config, metadataCache, metrics, authorizer)
+        // 请求处理 handler 线程池，默认8个
         requestHandlerPool = new KafkaRequestHandlerPool(config.brokerId, socketServer.requestChannel, apis, config.numIoThreads)
         brokerState.newState(RunningAsBroker)
 
@@ -239,6 +241,7 @@ class KafkaServer(val config: KafkaConfig, time: Time = SystemTime, threadNamePr
           else
             (protocol, endpoint)
         }
+        //向zk注册临时节点 brokers/ids/{brokerId} 作为broker在线的健康检查依据
         kafkaHealthcheck = new KafkaHealthcheck(config.brokerId, listeners, zkUtils, config.rack,
           config.interBrokerProtocolVersion)
         kafkaHealthcheck.startup()
