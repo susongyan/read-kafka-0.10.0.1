@@ -734,13 +734,25 @@ class ReplicaManager(val config: KafkaConfig,
 
   /*
    * Make the current broker to become follower for a given set of partitions by:
+   * 当前broker设置为一批 partition分区的 follower，创建 fetch线程拉取分区数据副本
    *
    * 1. Remove these partitions from the leader partitions set.
+   *  自己不是这些分区的leader，将这些分区从 leader 分区集合中挪出去
+   *
    * 2. Mark the replicas as followers so that no more data can be added from the producer clients.
+   *  将这些分区标记为follower，这样生产者客户端就不能通过本broker 向这些分区写入数据了
+   *
    * 3. Stop fetchers for these partitions so that no more data can be added by the replica fetcher threads.
+   *  停止已有的 fetcher 线程
+   *
    * 4. Truncate the log and checkpoint offsets for these partitions.
+   *  清理这些分区的日志和检查点
+   *
    * 5. Clear the produce and fetch requests in the purgatory
+   *  清理延迟调度的请求
+   *
    * 6. If the broker is not shutting down, add the fetcher to the new leaders.
+   *  添加新的fetcher，从这些partition的新leader broker 拉取数据
    *
    * The ordering of doing these steps make sure that the replicas in transition will not
    * take any more messages before checkpointing offsets so that all messages before the checkpoint

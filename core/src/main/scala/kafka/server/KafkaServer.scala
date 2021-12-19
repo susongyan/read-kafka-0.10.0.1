@@ -180,6 +180,7 @@ class KafkaServer(val config: KafkaConfig, time: Time = SystemTime, threadNamePr
         zkUtils = initZk()
 
         /* start log manager */
+        // 核心核心!!! 磁盘日志管理
         logManager = createLogManager(zkUtils.zkClient, brokerState)
         logManager.startup()
 
@@ -191,6 +192,7 @@ class KafkaServer(val config: KafkaConfig, time: Time = SystemTime, threadNamePr
         socketServer.startup()
 
         /* start replica manager */
+        // 复制管理器，主要负责分区数据的高可用 副本管理、高水位HW、isr列表管理
         replicaManager = new ReplicaManager(config, metrics, time, kafkaMetricsTime, zkUtils, kafkaScheduler, logManager,
           isShuttingDown)
         replicaManager.startup()
@@ -230,6 +232,7 @@ class KafkaServer(val config: KafkaConfig, time: Time = SystemTime, threadNamePr
           case (clientId, properties) => dynamicConfigHandlers(ConfigType.Client).processConfigChanges(clientId, properties)
         }
 
+        // 配置变更管理器，基于zk /config/changes/config_change_{临时顺序节点序号} 做事件通知
         // Create the config manager. start listening to notifications
         dynamicConfigManager = new DynamicConfigManager(zkUtils, dynamicConfigHandlers)
         dynamicConfigManager.startup()
