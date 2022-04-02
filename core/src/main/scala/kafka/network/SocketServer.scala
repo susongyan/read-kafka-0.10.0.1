@@ -411,10 +411,13 @@ private[kafka] class Processor(val id: Int,
     while (isRunning) {
       try {
         // setup any new connections that have been queued up
+        // 新建立的连接关注 op_read
         configureNewConnections()
         // register any new responses for writing
+        // 处理响应
         processNewResponses()
         poll()
+        // 接受完整的请求，放入请求队列里
         processCompletedReceives()
         processCompletedSends()
         processDisconnected()
@@ -444,6 +447,8 @@ private[kafka] class Processor(val id: Int,
             // that are sitting in the server's socket buffer
             curr.request.updateRequestMetrics
             trace("Socket server received empty response to send, registering for read: " + curr)
+            // 对于每个连接，处理完响应后才重新监听 op_read 事件
+            // 所以虽然是多个处理线程进行处理的，对于每个客户端连接来说请求是顺序处理的
             selector.unmute(curr.request.connectionId)
           case RequestChannel.SendAction =>
             sendResponse(curr)
@@ -492,6 +497,7 @@ private[kafka] class Processor(val id: Int,
           channel.socketAddress)
         val req = RequestChannel.Request(processor = id, connectionId = receive.source, session = session, buffer = receive.payload, startTimeMs = time.milliseconds, securityProtocol = protocol)
         requestChannel.sendRequest(req)
+        // 接收到一个完整请求后，取消该连接的 op_read，等处理完毕后再关注
         selector.mute(receive.source)
       } catch {
         case e @ (_: InvalidRequestException | _: SchemaException) =>

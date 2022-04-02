@@ -218,95 +218,96 @@ public class ProducerConfig extends AbstractConfig {
 
     static {
         CONFIG = new ConfigDef().define(BOOTSTRAP_SERVERS_CONFIG, Type.LIST, Importance.HIGH, CommonClientConfigs.BOOSTRAP_SERVERS_DOC)
-                                .define(BUFFER_MEMORY_CONFIG, Type.LONG, 32 * 1024 * 1024L, atLeast(0L), Importance.HIGH, BUFFER_MEMORY_DOC)
-                                .define(RETRIES_CONFIG, Type.INT, 0, between(0, Integer.MAX_VALUE), Importance.HIGH, RETRIES_DOC)
-                                .define(ACKS_CONFIG,
-                                        Type.STRING,
-                                        "1",
-                                        in("all", "-1", "0", "1"),
-                                        Importance.HIGH,
-                                        ACKS_DOC)
-                                .define(COMPRESSION_TYPE_CONFIG, Type.STRING, "none", Importance.HIGH, COMPRESSION_TYPE_DOC)
-                                .define(BATCH_SIZE_CONFIG, Type.INT, 16384, atLeast(0), Importance.MEDIUM, BATCH_SIZE_DOC)
-                                .define(TIMEOUT_CONFIG, Type.INT, 30 * 1000, atLeast(0), Importance.MEDIUM, TIMEOUT_DOC)
-                                .define(LINGER_MS_CONFIG, Type.LONG, 0, atLeast(0L), Importance.MEDIUM, LINGER_MS_DOC)
-                                .define(CLIENT_ID_CONFIG, Type.STRING, "", Importance.MEDIUM, CommonClientConfigs.CLIENT_ID_DOC)
-                                .define(SEND_BUFFER_CONFIG, Type.INT, 128 * 1024, atLeast(0), Importance.MEDIUM, CommonClientConfigs.SEND_BUFFER_DOC)
-                                .define(RECEIVE_BUFFER_CONFIG, Type.INT, 32 * 1024, atLeast(0), Importance.MEDIUM, CommonClientConfigs.RECEIVE_BUFFER_DOC)
-                                .define(MAX_REQUEST_SIZE_CONFIG,
-                                        Type.INT,
-                                        1 * 1024 * 1024,
-                                        atLeast(0),
-                                        Importance.MEDIUM,
-                                        MAX_REQUEST_SIZE_DOC)
-                                .define(BLOCK_ON_BUFFER_FULL_CONFIG, Type.BOOLEAN, false, Importance.LOW, BLOCK_ON_BUFFER_FULL_DOC)
-                                .define(RECONNECT_BACKOFF_MS_CONFIG, Type.LONG, 50L, atLeast(0L), Importance.LOW, CommonClientConfigs.RECONNECT_BACKOFF_MS_DOC)
-                                .define(METRIC_REPORTER_CLASSES_CONFIG, Type.LIST, "", Importance.LOW, CommonClientConfigs.METRIC_REPORTER_CLASSES_DOC)
-                                .define(RETRY_BACKOFF_MS_CONFIG, Type.LONG, 100L, atLeast(0L), Importance.LOW, CommonClientConfigs.RETRY_BACKOFF_MS_DOC)
-                                .define(METADATA_FETCH_TIMEOUT_CONFIG,
-                                        Type.LONG,
-                                        60 * 1000,
-                                        atLeast(0),
-                                        Importance.LOW,
-                                        METADATA_FETCH_TIMEOUT_DOC)
-                                .define(MAX_BLOCK_MS_CONFIG,
-                                        Type.LONG,
-                                        60 * 1000,
-                                        atLeast(0),
-                                        Importance.MEDIUM,
-                                        MAX_BLOCK_MS_DOC)
-                                .define(REQUEST_TIMEOUT_MS_CONFIG,
-                                        Type.INT,
-                                        30 * 1000,
-                                        atLeast(0),
-                                        Importance.MEDIUM,
-                                        REQUEST_TIMEOUT_MS_DOC)
-                                .define(METADATA_MAX_AGE_CONFIG, Type.LONG, 5 * 60 * 1000, atLeast(0), Importance.LOW, METADATA_MAX_AGE_DOC)
-                                .define(METRICS_SAMPLE_WINDOW_MS_CONFIG,
-                                        Type.LONG,
-                                        30000,
-                                        atLeast(0),
-                                        Importance.LOW,
-                                        CommonClientConfigs.METRICS_SAMPLE_WINDOW_MS_DOC)
-                                .define(METRICS_NUM_SAMPLES_CONFIG, Type.INT, 2, atLeast(1), Importance.LOW, CommonClientConfigs.METRICS_NUM_SAMPLES_DOC)
-                                .define(MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION,
-                                        Type.INT,
-                                        5,
-                                        atLeast(1),
-                                        Importance.LOW,
-                                        MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION_DOC)
-                                .define(KEY_SERIALIZER_CLASS_CONFIG,
-                                        Type.CLASS,
-                                        Importance.HIGH,
-                                        KEY_SERIALIZER_CLASS_DOC)
-                                .define(VALUE_SERIALIZER_CLASS_CONFIG,
-                                        Type.CLASS,
-                                        Importance.HIGH,
-                                        VALUE_SERIALIZER_CLASS_DOC)
-                                /* default is set to be a bit lower than the server default (10 min), to avoid both client and server closing connection at same time */
-                                .define(CONNECTIONS_MAX_IDLE_MS_CONFIG,
-                                        Type.LONG,
-                                        9 * 60 * 1000,
-                                        Importance.MEDIUM,
-                                        CommonClientConfigs.CONNECTIONS_MAX_IDLE_MS_DOC)
-                                .define(PARTITIONER_CLASS_CONFIG,
-                                        Type.CLASS,
-                                        DefaultPartitioner.class.getName(),
-                                        Importance.MEDIUM, PARTITIONER_CLASS_DOC)
-                                .define(INTERCEPTOR_CLASSES_CONFIG,
-                                        Type.LIST,
-                                        null,
-                                        Importance.LOW,
-                                        INTERCEPTOR_CLASSES_DOC)
+                .define(BUFFER_MEMORY_CONFIG, Type.LONG, 32 * 1024 * 1024L, atLeast(0L), Importance.HIGH, BUFFER_MEMORY_DOC)
+                .define(RETRIES_CONFIG, Type.INT, 0, between(0, Integer.MAX_VALUE), Importance.HIGH, RETRIES_DOC)
+                .define(ACKS_CONFIG,
+                        Type.STRING,
+                        "1",
+                        in("all", "-1", "0", "1"),
+                        Importance.HIGH,
+                        ACKS_DOC)
+                .define(COMPRESSION_TYPE_CONFIG, Type.STRING, "none", Importance.HIGH, COMPRESSION_TYPE_DOC)
+                .define(BATCH_SIZE_CONFIG, Type.INT, 16384, atLeast(0), Importance.MEDIUM, BATCH_SIZE_DOC)
+                .define(TIMEOUT_CONFIG, Type.INT, 30 * 1000, atLeast(0), Importance.MEDIUM, TIMEOUT_DOC)
+                .define(LINGER_MS_CONFIG, Type.LONG, 0, atLeast(0L), Importance.MEDIUM, LINGER_MS_DOC)
+                .define(CLIENT_ID_CONFIG, Type.STRING, "", Importance.MEDIUM, CommonClientConfigs.CLIENT_ID_DOC)
+                .define(SEND_BUFFER_CONFIG, Type.INT, 128 * 1024, atLeast(0), Importance.MEDIUM, CommonClientConfigs.SEND_BUFFER_DOC)
+                .define(RECEIVE_BUFFER_CONFIG, Type.INT, 32 * 1024, atLeast(0), Importance.MEDIUM, CommonClientConfigs.RECEIVE_BUFFER_DOC)
+                .define(MAX_REQUEST_SIZE_CONFIG,
+                        Type.INT,
+                        1 * 1024 * 1024,
+                        atLeast(0),
+                        Importance.MEDIUM,
+                        MAX_REQUEST_SIZE_DOC)
+                .define(BLOCK_ON_BUFFER_FULL_CONFIG, Type.BOOLEAN, false, Importance.LOW, BLOCK_ON_BUFFER_FULL_DOC)
+                .define(RECONNECT_BACKOFF_MS_CONFIG, Type.LONG, 50L, atLeast(0L), Importance.LOW, CommonClientConfigs.RECONNECT_BACKOFF_MS_DOC)
+                .define(METRIC_REPORTER_CLASSES_CONFIG, Type.LIST, "", Importance.LOW, CommonClientConfigs.METRIC_REPORTER_CLASSES_DOC)
+                .define(RETRY_BACKOFF_MS_CONFIG, Type.LONG, 100L, atLeast(0L), Importance.LOW, CommonClientConfigs.RETRY_BACKOFF_MS_DOC)
+                .define(METADATA_FETCH_TIMEOUT_CONFIG,
+                        Type.LONG,
+                        60 * 1000,
+                        atLeast(0),
+                        Importance.LOW,
+                        METADATA_FETCH_TIMEOUT_DOC)
+                .define(MAX_BLOCK_MS_CONFIG,
+                        Type.LONG,
+                        60 * 1000,
+                        atLeast(0),
+                        Importance.MEDIUM,
+                        MAX_BLOCK_MS_DOC)
+                .define(REQUEST_TIMEOUT_MS_CONFIG,
+                        Type.INT,
+                        30 * 1000,
+                        atLeast(0),
+                        Importance.MEDIUM,
+                        REQUEST_TIMEOUT_MS_DOC)
+                .define(METADATA_MAX_AGE_CONFIG, Type.LONG, 5 * 60 * 1000, atLeast(0), Importance.LOW, METADATA_MAX_AGE_DOC)
+                .define(METRICS_SAMPLE_WINDOW_MS_CONFIG,
+                        Type.LONG,
+                        30000,
+                        atLeast(0),
+                        Importance.LOW,
+                        CommonClientConfigs.METRICS_SAMPLE_WINDOW_MS_DOC)
+                .define(METRICS_NUM_SAMPLES_CONFIG, Type.INT, 2, atLeast(1), Importance.LOW, CommonClientConfigs.METRICS_NUM_SAMPLES_DOC)
+                .define(MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION,
+                        Type.INT,
+                        5,
+                        atLeast(1),
+                        Importance.LOW,
+                        MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION_DOC)
+                .define(KEY_SERIALIZER_CLASS_CONFIG,
+                        Type.CLASS,
+                        Importance.HIGH,
+                        KEY_SERIALIZER_CLASS_DOC)
+                .define(VALUE_SERIALIZER_CLASS_CONFIG,
+                        Type.CLASS,
+                        Importance.HIGH,
+                        VALUE_SERIALIZER_CLASS_DOC)
+                /* default is set to be a bit lower than the server default (10 min), to avoid both client and server closing connection at same time */
+                .define(CONNECTIONS_MAX_IDLE_MS_CONFIG,
+                        Type.LONG,
+                        9 * 60 * 1000,
+                        Importance.MEDIUM,
+                        CommonClientConfigs.CONNECTIONS_MAX_IDLE_MS_DOC)
+                .define(PARTITIONER_CLASS_CONFIG,
+                        Type.CLASS,
+                        DefaultPartitioner.class.getName(),
+                        Importance.MEDIUM, PARTITIONER_CLASS_DOC)
+                .define(INTERCEPTOR_CLASSES_CONFIG,
+                        Type.LIST,
+                        null,
+                        Importance.LOW,
+                        INTERCEPTOR_CLASSES_DOC)
 
-                                // security support
-                                .define(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG,
-                                        Type.STRING,
-                                        CommonClientConfigs.DEFAULT_SECURITY_PROTOCOL,
-                                        Importance.MEDIUM,
-                                        CommonClientConfigs.SECURITY_PROTOCOL_DOC)
-                                .withClientSslSupport()
-                                .withClientSaslSupport();
+                // security support
+                .define(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG,
+                        Type.STRING,
+                        CommonClientConfigs.DEFAULT_SECURITY_PROTOCOL,
+                        Importance.MEDIUM,
+                        CommonClientConfigs.SECURITY_PROTOCOL_DOC)
+                .withClientSslSupport()
+                .withClientSaslSupport();
+
 
     }
 
