@@ -379,6 +379,12 @@ class Log(val dir: File,
             .format(validMessages.sizeInBytes, config.segmentSize))
         }
 
+
+        // 滚动创建新的 segment  newOffset.log  xx.index
+        // 如果:
+        // (1)当前segment已经满了 1G;
+        // (2)segment创建时间超过 roll 时长 1Day;
+        // (3)index索引文件满了 10M；
         // maybe roll the log if this segment is full
         val segment = maybeRoll(validMessages.sizeInBytes)
 
@@ -386,6 +392,7 @@ class Log(val dir: File,
         segment.append(appendInfo.firstOffset, validMessages)
 
         // increment the log end offset
+        // 更新 LEO
         updateLogEndOffset(appendInfo.lastOffset + 1)
 
         trace("Appended message set to log %s with first offset: %d, next offset: %d, and messages: %s"
@@ -658,7 +665,7 @@ class Log(val dir: File,
       }
       val segment = new LogSegment(dir,
                                    startOffset = newOffset,
-                                   indexIntervalBytes = config.indexInterval,
+                                   indexIntervalBytes = config.indexInterval, // 每 4096Byte 创建一个索引
                                    maxIndexSize = config.maxIndexSize,
                                    rollJitterMs = config.randomSegmentJitter,
                                    time = time,

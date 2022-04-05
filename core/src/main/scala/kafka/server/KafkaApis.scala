@@ -396,6 +396,7 @@ class KafkaApis(val requestChannel: RequestChannel,
     else {
       val internalTopicsAllowed = request.header.clientId == AdminUtils.AdminClientId
 
+      // 将请求根据 topicPartition 拆分
       // Convert ByteBuffer to ByteBufferMessageSet
       val authorizedMessagesPerPartition = authorizedRequestInfo.map {
         case (topicPartition, buffer) => (topicPartition, new ByteBufferMessageSet(buffer))

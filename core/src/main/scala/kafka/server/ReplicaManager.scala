@@ -328,6 +328,7 @@ class ReplicaManager(val config: KafkaConfig,
 
     if (isValidRequiredAcks(requiredAcks)) {
       val sTime = SystemTime.milliseconds
+      // 写入本地日志
       val localProduceResults = appendToLocalLog(internalTopicsAllowed, messagesPerPartition, requiredAcks)
       debug("Produce to local log in %d ms".format(SystemTime.milliseconds - sTime))
 
@@ -338,6 +339,7 @@ class ReplicaManager(val config: KafkaConfig,
                   new PartitionResponse(result.errorCode, result.info.firstOffset, result.info.timestamp)) // response status
       }
 
+      // 是否需要的等待消息同步完毕所有 isr列表里的副本
       if (delayedRequestRequired(requiredAcks, messagesPerPartition, localProduceResults)) {
         // create delayed produce operation
         val produceMetadata = ProduceMetadata(requiredAcks, produceStatus)
@@ -349,6 +351,7 @@ class ReplicaManager(val config: KafkaConfig,
         // try to complete the request immediately, otherwise put it into the purgatory
         // this is because while the delayed produce operation is being created, new
         // requests may arrive and hence make this operation completable.
+        // 看isr列表的副本是否同步完毕，如果没有完毕则监听新消息的 partition作为key 加锁等待同步完毕，然后才执行回调 responseCallBack(sendResponseCallback 发送响应)
         delayedProducePurgatory.tryCompleteElseWatch(delayedProduce, producerRequestKeys)
 
       } else {
@@ -371,9 +374,9 @@ class ReplicaManager(val config: KafkaConfig,
 
   // If all the following conditions are true, we need to put a delayed produce request and wait for replication to complete
   //
-  // 1. required acks = -1
-  // 2. there is data to append
-  // 3. at least one partition append was successful (fewer errors than partitions)
+  // 1. required acks = -1      需要同步给所有副本
+  // 2. there is data to append 数据非空
+  // 3. at least one partition append was successful (fewer errors than partitions) 本地日志起码有一个partition写成功
   private def delayedRequestRequired(requiredAcks: Short, messagesPerPartition: Map[TopicPartition, MessageSet],
                                        localProduceResults: Map[TopicPartition, LogAppendResult]): Boolean = {
     requiredAcks == -1 &&
@@ -387,6 +390,7 @@ class ReplicaManager(val config: KafkaConfig,
 
   /**
    * Append the messages to the local replica logs
+   * 消息写入本地日志
    */
   private def appendToLocalLog(internalTopicsAllowed: Boolean,
                                messagesPerPartition: Map[TopicPartition, MessageSet],
@@ -406,6 +410,7 @@ class ReplicaManager(val config: KafkaConfig,
           val partitionOpt = getPartition(topicPartition.topic, topicPartition.partition)
           val info = partitionOpt match {
             case Some(partition) =>
+              // 消息写入到leader replica
               partition.appendMessagesToLeader(messages.asInstanceOf[ByteBufferMessageSet], requiredAcks)
             case None => throw new UnknownTopicOrPartitionException("Partition %s doesn't exist on %d"
               .format(topicPartition, localBrokerId))
@@ -417,6 +422,7 @@ class ReplicaManager(val config: KafkaConfig,
             else
               info.lastOffset - info.firstOffset + 1
 
+          // 一些 metircs 指标
           // update stats for successfully appended bytes and messages as bytesInRate and messageInRate
           BrokerTopicStats.getBrokerTopicStats(topicPartition.topic).bytesInRate.mark(messages.sizeInBytes)
           BrokerTopicStats.getBrokerAllTopicsStats.bytesInRate.mark(messages.sizeInBytes)

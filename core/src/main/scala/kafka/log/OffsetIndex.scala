@@ -58,6 +58,7 @@ class OffsetIndex(@volatile private[this] var _file: File, val baseOffset: Long,
   private val lock = new ReentrantLock
   
   /* initialize the memory mapping for this index */
+  // 文件映射到 os-cache 的实现  MappedByteBuffer
   @volatile
   private[this] var mmap: MappedByteBuffer = {
     val newlyCreated = _file.createNewFile()

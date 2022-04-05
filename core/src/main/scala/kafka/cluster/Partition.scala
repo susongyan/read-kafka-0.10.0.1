@@ -91,6 +91,8 @@ class Partition(val topic: String,
         if (isReplicaLocal(replicaId)) {
           val config = LogConfig.fromProps(logManager.defaultConfig.originals,
                                            AdminUtils.fetchEntityConfig(zkUtils, ConfigType.Topic, topic))
+          // 创建分区对应的日志文件对象 Log
+          // 分区目录名：{topic}-{partition}
           val log = logManager.createLog(TopicAndPartition(topic, partitionId), config)
           val checkpoint = replicaManager.highWatermarkCheckpoints(log.dir.getParentFile.getAbsolutePath)
           val offsetMap = checkpoint.read
@@ -429,20 +431,22 @@ class Partition(val topic: String,
       leaderReplicaOpt match {
         case Some(leaderReplica) =>
           val log = leaderReplica.log.get
-          val minIsr = log.config.minInSyncReplicas
-          val inSyncSize = inSyncReplicas.size
+          val minIsr = log.config.minInSyncReplicas // isr 最小值1
+          val inSyncSize = inSyncReplicas.size // 当前处于 isr 的副本数
 
+          // 如果isr同步列表中的副本数 小于最小isr设置，且 producer 要求所有副本都同步完成再ack ，则报错
           // Avoid writing to leader if there are not enough insync replicas to make it safe
           if (inSyncSize < minIsr && requiredAcks == -1) {
             throw new NotEnoughReplicasException("Number of insync replicas for partition [%s,%d] is [%d], below required minimum [%d]"
               .format(topic, partitionId, inSyncSize, minIsr))
           }
 
+          //将消息写入到当前 segment 分段中
           val info = log.append(messages, assignOffsets = true)
           // probably unblock some follower fetch requests since log end offset has been updated
           replicaManager.tryCompleteDelayedFetch(new TopicPartitionOperationKey(this.topic, this.partitionId))
           // we may need to increment high watermark since ISR could be down to 1
-          (info, maybeIncrementLeaderHW(leaderReplica))
+          (info, maybeIncrementLeaderHW(leaderReplica)) //更新 hw 高水位offset
 
         case None =>
           throw new NotLeaderForPartitionException("Leader not local for partition [%s,%d] on broker %d"
