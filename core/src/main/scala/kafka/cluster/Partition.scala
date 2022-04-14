@@ -241,7 +241,7 @@ class Partition(val topic: String,
         replica.updateLogReadResult(logReadResult)
         // check if we need to expand ISR to include this replica
         // if it is not in the ISR yet
-        maybeExpandIsr(replicaId)
+        maybeExpandIsr(replicaId) // 如果 follower replicaId 原来不在isr列表中，fetch后 follower 的leo>= leader hw 则加入到 isr 列表
 
         debug("Recorded replica %d log end offset (LEO) position %d for partition %s."
           .format(replicaId,
@@ -262,6 +262,7 @@ class Partition(val topic: String,
    * Check and maybe expand the ISR of the partition.
    *
    * This function can be triggered when a replica's LEO has incremented
+   * // 如果 follower replicaId 原来不在isr列表中，fetch后 follower 的leo>= leader hw 则加入到 isr 列表
    */
   def maybeExpandIsr(replicaId: Int) {
     val leaderHWIncremented = inWriteLock(leaderIsrUpdateLock) {
@@ -284,6 +285,7 @@ class Partition(val topic: String,
 
           // check if the HW of the partition can now be incremented
           // since the replica maybe now be in the ISR and its LEO has just incremented
+          //
           maybeIncrementLeaderHW(leaderReplica)
 
         case None => false // nothing to do if no longer leader
@@ -374,6 +376,11 @@ class Partition(val topic: String,
     replicaManager.tryCompleteDelayedProduce(requestKey)
   }
 
+  /**
+   *  收缩 isr 列表，将
+   *
+    * @param replicaMaxLagTimeMs
+   */
   def maybeShrinkIsr(replicaMaxLagTimeMs: Long) {
     val leaderHWIncremented = inWriteLock(leaderIsrUpdateLock) {
       leaderReplicaIfLocal() match {

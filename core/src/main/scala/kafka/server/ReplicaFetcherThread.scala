@@ -61,9 +61,9 @@ class ReplicaFetcherThread(name: String,
     else 0
   private val socketTimeout: Int = brokerConfig.replicaSocketTimeoutMs
   private val replicaId = brokerConfig.brokerId
-  private val maxWait = brokerConfig.replicaFetchWaitMaxMs
-  private val minBytes = brokerConfig.replicaFetchMinBytes
-  private val fetchSize = brokerConfig.replicaFetchMaxBytes
+  private val maxWait = brokerConfig.replicaFetchWaitMaxMs  // 500ms
+  private val minBytes = brokerConfig.replicaFetchMinBytes  // 1
+  private val fetchSize = brokerConfig.replicaFetchMaxBytes // 1M
 
   private def clientId = name
 
@@ -294,7 +294,7 @@ object ReplicaFetcherThread {
 
     def toByteBufferMessageSet: ByteBufferMessageSet = new ByteBufferMessageSet(underlying.recordSet)
 
-    def highWatermark: Long = underlying.highWatermark
+    def highWatermark: Long = underlying.highWatermark // leader 会在follower fetch的时候返回当前 HW
 
     def exception: Option[Throwable] = Errors.forCode(errorCode) match {
       case Errors.NONE => None
