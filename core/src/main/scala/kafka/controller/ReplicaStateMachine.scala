@@ -360,8 +360,8 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
               val curBrokers = currentBrokerList.map(_.toInt).toSet.flatMap(zkUtils.getBrokerInfo)
               val curBrokerIds = curBrokers.map(_.id)
               val liveOrShuttingDownBrokerIds = controllerContext.liveOrShuttingDownBrokerIds
-              val newBrokerIds = curBrokerIds -- liveOrShuttingDownBrokerIds
-              val deadBrokerIds = liveOrShuttingDownBrokerIds -- curBrokerIds
+              val newBrokerIds = curBrokerIds -- liveOrShuttingDownBrokerIds //新broker
+              val deadBrokerIds = liveOrShuttingDownBrokerIds -- curBrokerIds // 挂掉的broker
               val newBrokers = curBrokers.filter(broker => newBrokerIds(broker.id))
               controllerContext.liveBrokers = curBrokers
               val newBrokerIdsSorted = newBrokerIds.toSeq.sorted
@@ -369,7 +369,7 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
               val liveBrokerIdsSorted = curBrokerIds.toSeq.sorted
               info("Newly added brokers: %s, deleted brokers: %s, all live brokers: %s"
                 .format(newBrokerIdsSorted.mkString(","), deadBrokerIdsSorted.mkString(","), liveBrokerIdsSorted.mkString(",")))
-              newBrokers.foreach(controllerContext.controllerChannelManager.addBroker)
+              newBrokers.foreach(controllerContext.controllerChannelManager.addBroker) // 建立新broker的网络通信组件
               deadBrokerIds.foreach(controllerContext.controllerChannelManager.removeBroker)
               if(newBrokerIds.size > 0)
                 controller.onBrokerStartup(newBrokerIdsSorted)

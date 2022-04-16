@@ -334,7 +334,7 @@ class KafkaController(val config : KafkaConfig, zkUtils: ZkUtils, val brokerStat
       registerReassignedPartitionsListener()
       // 监听 isr 列表变化 /isr_change_notification
       registerIsrChangeNotificationListener()
-      // 监听分区副本偏好  /admin/preferred_replica_election
+      // 监听分区副本更合理(均衡)的分配  /admin/preferred_replica_election
       registerPreferredReplicaElectionListener()
       // 监听分区状态变化 /brokers/topics
       partitionStateMachine.registerListeners()
@@ -354,12 +354,16 @@ class KafkaController(val config : KafkaConfig, zkUtils: ZkUtils, val brokerStat
       /* send partition leadership info to all live brokers */
       // 发送 topic 分区分配方案给所有 broker
       sendUpdateMetadataRequest(controllerContext.liveOrShuttingDownBrokerIds.toSeq)
+
+      // leader 自平衡
       if (config.autoLeaderRebalanceEnable) {
         info("starting the partition rebalance scheduler")
         autoRebalanceScheduler.startup()
+        // 5分钟检查一次
         autoRebalanceScheduler.schedule("partition-rebalance-thread", checkAndTriggerPartitionRebalance,
           5, config.leaderImbalanceCheckIntervalSeconds.toLong, TimeUnit.SECONDS)
       }
+      // topic 清理
       deleteTopicManager.start()
     }
     else
@@ -479,12 +483,14 @@ class KafkaController(val config : KafkaConfig, zkUtils: ZkUtils, val brokerStat
     info("Removed %s from list of shutting down brokers.".format(deadBrokersThatWereShuttingDown))
     val deadBrokersSet = deadBrokers.toSet
     // trigger OfflinePartition state for all partitions whose current leader is one amongst the dead brokers
-    val partitionsWithoutLeader = controllerContext.partitionLeadershipInfo.filter(partitionAndLeader =>
+    // 如果宕机的 broker 中存在 leader partition, 这个变量名不对劲
+    val partitionsWithLeader = controllerContext.partitionLeadershipInfo.filter(partitionAndLeader =>
       deadBrokersSet.contains(partitionAndLeader._2.leaderAndIsr.leader) &&
         !deleteTopicManager.isTopicQueuedUpForDeletion(partitionAndLeader._1.topic)).keySet
-    partitionStateMachine.handleStateChanges(partitionsWithoutLeader, OfflinePartition)
+    // 标记宕机broker上所有的 leader partition 状态为 offline, 并通知其他broker
+    partitionStateMachine.handleStateChanges(partitionsWithLeader, OfflinePartition)
     // trigger OnlinePartition state changes for offline or new partitions
-    partitionStateMachine.triggerOnlinePartitionStateChange()
+    partitionStateMachine.triggerOnlinePartitionStateChange() // 分区变更, 重新选举leader
     // filter out the replicas that belong to topics that are being deleted
     var allReplicasOnDeadBrokers = controllerContext.replicasOnBrokers(deadBrokersSet)
     val activeReplicasOnDeadBrokers = allReplicasOnDeadBrokers.filterNot(p => deleteTopicManager.isTopicQueuedUpForDeletion(p.topic))
@@ -501,7 +507,7 @@ class KafkaController(val config : KafkaConfig, zkUtils: ZkUtils, val brokerStat
 
     // If broker failure did not require leader re-election, inform brokers of failed broker
     // Note that during leader re-election, brokers update their metadata
-    if (partitionsWithoutLeader.isEmpty) {
+    if (partitionsWithLeader.isEmpty) {
       sendUpdateMetadataRequest(controllerContext.liveOrShuttingDownBrokerIds.toSeq)
     }
   }
